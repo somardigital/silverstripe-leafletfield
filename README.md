@@ -78,6 +78,16 @@ Define custom options for individual field instances (overrides defaults).
 
 The draw options are set using the same structure as [Leaflet.draw options](https://github.com/Leaflet/Leaflet.draw#drawoptions).
 
+### Circles
+
+GeoJSON has no circle type, so a circle is saved as a `Point` feature with its radius, in metres,
+in the feature's properties. It's drawn as a circle again when the field loads.
+
+    {"type": "Feature", "properties": {"radius": 1500}, "geometry": {"type": "Point", "coordinates": [174.7633, -36.8485]}}
+
+Anything else that displays the saved value needs to read `properties.radius` to draw it as a circle,
+otherwise it shows as a point.
+
 
 ## Maintainer Contacts
 

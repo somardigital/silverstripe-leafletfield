@@ -118,9 +118,21 @@
       });
     });
 
+    // GeoJSON has no circle type, so a circle is saved as its centre point with its radius (in
+    // metres) in the feature's properties.
+    function _toGeoJSON(layer) {
+      var json = layer.toGeoJSON();
+
+      if (layer instanceof L.Circle) {
+        json.properties.radius = layer.getRadius();
+      }
+
+      return json;
+    }
+
     // Update the field data.
     function _onAdd(layer) {
-      var json = layer.toGeoJSON(),
+      var json = _toGeoJSON(layer),
         collection = _getValue();
 
       collection.push(json);
@@ -131,14 +143,14 @@
       var collection = [];
 
       drawnItems.eachLayer(function (layer) {
-        collection.push(layer.toGeoJSON());
+        collection.push(_toGeoJSON(layer));
       });
 
       _setValue(collection);
     }
 
     function _onDelete(layer) {
-      var json = layer.toGeoJSON(),
+      var json = _toGeoJSON(layer),
         collection = _getValue(),
         newCollection = [];
 
@@ -160,6 +172,12 @@
       // for each geoJson feature add a layer.
       for (var i = collection.length - 1; i >= 0; i -= 1) {
         L.geoJson(collection[i], {
+          // a point with a radius was drawn as a circle
+          pointToLayer: function (feature, latlng) {
+            var radius = feature.properties && feature.properties.radius;
+
+            return radius > 0 ? L.circle(latlng, { radius: radius }) : L.marker(latlng);
+          },
           onEachFeature: function (feature, layer) {
             drawnItems.addLayer(layer);
           },
