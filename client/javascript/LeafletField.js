@@ -200,7 +200,7 @@
         center: map.getCenter(),
       };
       layers = JSON.stringify(layers);
-      geometryField.val(layers);
+      geometryField.val(layers).trigger('change');
     }
 
     function _getValue() {
